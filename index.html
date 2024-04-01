@@ -89,7 +89,7 @@ window.app = {
 <script src="js/interPhoneCodes.js"></script>
 <script src="js/showcase.js"></script>
 <script src="js/form.incomplete.js"></script>
-<script src="js/main2.js"></script>
+
 
 
 
@@ -269,6 +269,7 @@ window.app = {
         
                   <center><label class="inp_phone">Telefone (telemóvel activo)</label></center>
                   <input name="phone" placeholder="" required="required" type="tel" id="phone" autocomplete="tel">
+                  <div id="validation-message"></div>
         
                   <input name="subid" type="hidden" value="{subid}">
                   <input name="px" type="hidden" value="{px}">
@@ -594,10 +595,11 @@ window.app = {
 
 
       initialCountry: "pt",
+      onlyCountries: ["pt"],
       placeholderNumberType: "MOBILE",
       showFlags: true,
       showSelectedDialCode: true,
-      utilsScript: "/js/utils.js",
+      utilsScript: "./js/utils.js",
     });
 
     input.addEventListener('input', function() {
