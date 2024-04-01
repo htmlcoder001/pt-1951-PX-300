@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="pt">
+
+<head>
+
+<script src="js/jquery.min.js"></script>
+
+    <script>
+    function set_validator_errors(){
+        orderValidator.errorTitle = 'Пожалуйста, исправьте следующие ошибки'; 
+
+        orderValidator.errorNameField = 'Имя'; 
+        orderValidator.errorNameMess = 'Укажите своё имя'; 
+        
+        orderValidator.errorPhoneField = 'Телефон для связи'; 
+        orderValidator.errorPhoneMess = 'Введите правильный телефон'; 
+        
+        orderValidator.errorAddress = 'Введите правильный адрес'; 
+        orderValidator.errorRequired = 'обязательное поле'; 
+        orderValidator.errorMaxLength = 'допустимо максимум {1} символа'; 
+        orderValidator.errorMinLength = 'допустимо минимум {1} символа'; 
+        orderValidator.errorEmailField = 'E-mail';
+        orderValidator.errorEmail = 'указан не корректный email';
+        }
+    </script>
+<script>
+
+
+window.app = {
+    timestamp: parseInt((new Date()).getTime() / 1000),
+    jq: jQuery,
+    formAction: window.location.href,
+    leadToken: '6603e308692ec1.43521216',
+    offers: {"37973":{"id":37973,"country":{"code":"US","name":"\u0421\u043e\u0435\u0434\u0438\u043d\u0435\u043d\u043d\u044b\u0435 \u0428\u0442\u0430\u0442\u044b \u0410\u043c\u0435\u0440\u0438\u043a\u0438"},"price":"49","price2":"98","currency":{"code":"USD","name":"$"},"discount":"","delivery_price":"","link":"","product_sku":"","prepaid_info_html":""},"37974":{"id":37974,"country":{"code":"ES","name":"\u0418\u0441\u043f\u0430\u043d\u0438\u044f"},"price":"49","price2":"98","currency":{"code":"EUR","name":"\u20ac"},"discount":"","delivery_price":"","link":"","product_sku":"","prepaid_info_html":""},"37975":{"id":37975,"country":{"code":"SK","name":"\u0421\u043b\u043e\u0432\u0430\u043a\u0438\u044f"},"price":"39","price2":"78","currency":{"code":"EUR","name":"\u20ac"},"discount":"","delivery_price":"","link":"","product_sku":"","prepaid_info_html":""},"37976":{"id":37976,"country":{"code":"HU","name":"\u0412\u0435\u043d\u0433\u0440\u0438\u044f"},"price":"13900","price2":"27800","currency":{"code":"HUF","name":"Ft"},"discount":"","delivery_price":"","link":"","product_sku":"","prepaid_info_html":""},"37978":{"id":37978,"country":{"code":"CY","name":"\u041a\u0438\u043f\u0440"},"price":"39","price2":"78","currency":{"code":"EUR","name":"\u20ac"},"discount":"","delivery_price":"","link":"","product_sku":"","prepaid_info_html":""},"37979":{"id":37979,"country":{"code":"GR","name":"\u0413\u0440\u0435\u0446\u0438\u044f"},"price":"39","price2":"78","currency":{"code":"EUR","name":"\u20ac"},"discount":"","delivery_price":"","link":"","product_sku":"","prepaid_info_html":""},"37982":{"id":37982,"country":{"code":"CZ","name":"\u0427\u0435\u0445\u0438\u044f"},"price":"890","price2":"1780","currency":{"code":"CZK","name":"K\u010d"},"discount":"","delivery_price":"","link":"","product_sku":"","prepaid_info_html":""},"37984":{"id":37984,"country":{"code":"PL","name":"\u041f\u043e\u043b\u044c\u0448\u0430"},"price":"189","price2":"338","currency":{"code":"PLN","name":"Z\u0141"},"discount":"","delivery_price":"","link":"","product_sku":"","prepaid_info_html":""},"37985":{"id":37985,"country":{"code":"BG","name":"\u0411\u043e\u043b\u0433\u0430\u0440\u0438\u044f"},"price":"79","price2":"158","currency":{"code":"BGN","name":"\u043b\u0435\u0432"},"discount":"","delivery_price":"","link":"","product_sku":"","prepaid_info_html":""},"38026":{"id":38026,"country":{"code":"DE","name":"\u0413\u0435\u0440\u043c\u0430\u043d\u0438\u044f"},"price":"49","price2":"98","currency":{"code":"EUR","name":"\u20ac"},"discount":"","delivery_price":"","link":"","product_sku":"","prepaid_info_html":""},"38028":{"id":38028,"country":{"code":"AT","name":"\u0410\u0432\u0441\u0442\u0440\u0438\u044f"},"price":"49","price2":"98","currency":{"code":"EUR","name":"\u20ac"},"discount":"","delivery_price":"","link":"","product_sku":"","prepaid_info_html":""}},
+    currentOffer: {"id":38026,"country":{"code":"DE","name":"\u0413\u0435\u0440\u043c\u0430\u043d\u0438\u044f"},"price":"49","price2":"98","currency":{"code":"EUR","name":"\u20ac"},"discount":"","delivery_price":"","link":"","product_sku":"","prepaid_info_html":""},
+    allowedCountries: ["US","ES","SK","HU","CY","GR","CZ","PL","BG","DE","AT"],
+    _setOfferId: false,
+    streamHid: '',
+    showcaseUrl: '',
+    disablePhoneMask: Boolean(),
+    
+    setOffer: function (offerId) {
+        if (offerId == this._setOfferId) {
+            return ;
+        }
+        this._setOfferId = offerId;
+        if (offerId) {
+            var offer = app.offers[offerId];
+            var previousOffer = app.currentOffer;
+            app.currentOffer = offer;
+            var event = this.jq.Event("offerchange");
+            event.previousOffer = previousOffer;
+            event.currentOffer = app.currentOffer;
+            this.jq(document).trigger(event);
+            this.updatePage(offer);
+        } else {
+            $('input[name=country]').val('');
+        }
+    },
+    
+    updatePage: function(offer) {
+        $('x-newprice').html(offer.price);
+        $('x-oldprice').html(offer.price2);
+        $('x-currency').html(offer.currency.name);
+        $('input[name=offer], select[name=offer]').val(offer.id);
+        $('input[name=country]').val(offer.country.code);
+    },
+
+    blockForm: function() {
+        // Блокируем кнопки при отправке формы
+        $('input[type=submit]', $(this)).prop( 'disabled', true ).attr( 'disabled', true );
+        $('button', $(this)).prop( 'disabled', true ).attr( 'disabled', true );
+        app.incompleteOrder.lock = true;
+        clearTimeout(app.incompleteOrder.timer);
+    },
+
+    unblockForm: function() {
+        $('input[type=submit]', $(this)).prop( 'disabled', false ).attr( 'disabled', false );
+        $('button[type=submit]', $(this)).prop( 'disabled', false ).attr( 'disabled', false );
+        app.incompleteOrder.lock = false;
+        clearTimeout(app.incompleteOrder.timer);
+    }
+
+};
+
+
+</script>
+  <script src="js/form.validate.js"></script>
+<script src="js/interPhoneCodes.js"></script>
+<script src="js/showcase.js"></script>
+<script src="js/form.incomplete.js"></script>
+<script src="js/main2.js"></script>
+
+
+
+  <script src="js/jquery-1.12.4.min.js" type="text/javascript">
+  </script>
+  <style>
+    .ac_footer {
+      position: relative;
+      top: 10px;
+      height: 0;
+      text-align: center;
+      margin-bottom: 70px;
+      color: #A12000;
+    }
+    
+    .ac_footer a {
+      color: #A12000;
+    }
+    
+    .ac_footer p {
+      text-align: center;
+    }
+    
+    img[height="1"],
+    img[width="1"] {
+      display: none !important;
+    }
+  </style>
+  <!--retarget-->
+  <!--retarget-->
+  <script src="js/9.min.js" type="text/javascript">
+  </script>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
+  <title>PX-300 - YouMan</title>
+  <link href="css/css.css" rel="stylesheet">
+  <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
+  <link href="css/main.css" rel="stylesheet">
+  <link href="css/media.css" rel="stylesheet">
+  <script>
+  var config = {};
+  </script>
+  
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <div class="logo">
+        <a href><img alt src="images/logo.png"></a>
+      </div>
+    </div>
+    <div class="bg-header">
+      <div class="container">
+        <div class="burger"><img alt src="images/burger-menu.png"></div>
+        <div class="menu-block">
+          <ul class="menu">
+            <li class="menu__item"><a class="menu__item__link" href> Homens </a></li>
+            <li class="menu__item"><a class="menu__item__link" href> Mulheres </a></li>
+            <li class="menu__item"><a class="menu__item__link" href> Amor </a></li>
+            <li class="menu__item"><a class="menu__item__link" href> Sexo </a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </header>
+  <div class="content-bg">
+    <div class="container-fixed">
+      <div class="container">
+        <div class="flag">
+          <div class="flag-content">
+            <div class="social">
+              <a class="mini-logo" href><img alt src="images/mini_logo.png"></a>
+              <div class="social__item fb">
+                <div class="social__img"><img src="images/facebook_icon.png"></div>
+                <div class="social__text"> 95 </div>
+              </div>
+              <div class="social__item tw">
+                <div class="social__img"><img src="images/twitter_icon.png"></div>
+                <div class="social__text"> 183 </div>
+              </div>
+              <div class="social__item goofle">
+                <div class="social__img"><img src="images/google%2B_icon.png"></div>
+                <div class="social__text"> 46 </div>
+              </div>
+            </div>
+            <ul class="tags">
+              <li class="tags__item"><a class="tags__item__href" href> #sexo </a></li>
+              <li class="tags__item"><a class="tags__item__href" href> #PX-300 </a></li>
+              <li class="tags__item"><a class="tags__item__href" href> #truques </a></li>
+              <li class="tags__item"><a class="tags__item__href" href> #vidasexual </a></li>
+              <li class="tags__item"><a class="tags__item__href" href> #para_homens </a></li>
+              <li class="tags__item"><a class="tags__item__href" href> #amor </a></li>
+              <li class="tags__item"><a class="tags__item__href" href> #celebridades </a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="main-wrap">
+        <section class="main-content">
+          <div class="main-content__padding">
+            <h1 class="h1"> CHOQUE! <span class="h1__normal"> UMA ATRIZ QUE SE TORNOU UM MEME NA INTERNET REVELA OS SEGREDOS DA INDÚSTRIA PORNOGRÁFICA </span></h1>
+            <div class="header_extra">
+              <div class="iconblock"><i class="icon-clock"></i><span class="icontext"><script>
+           dtime_nums(-7, true)
+          </script></span></div>
+              <div class="iconblock"><i class="icon-eye"></i><span class="icontext"> 1456 </span></div>
+            </div>
+            <p><img alt src="images/img_1.jpg"></p>
+            <p> Em 2014, uma fotografia de uma loira magra e cinco homens afro-americanos apareceu na internet. É fácil de perceber que a fotografia era de um filme pornográfico. Pouco depois disso, a rapariga ganhou popularidade na indústria pornográfica. Hoje, ela desvenda os segredos do seu trabalho. Contactámos Piper Perri, uma estrela em ascensão na indústria pornográfica. Ela foi a rapariga do mês do site porno Girlsway em janeiro de 2018. </p>
+            <p><img alt src="images/img_2.jpg"></p>
+            <p><b> Piper, há quanto tempo trabalha na indústria pornográfica? </b></p>
+            <p> Faço pornografia desde 2014, trabalhei com estúdios como Bang Bros, Brazzers, Mofos, Reality Kings, Vivid, Lethal Hardcore, Elegant Angel, Kick Ass, Evil Angel и New Sensations. </p>
+            <p><b> A sua aparência é notável. A sua altura é de apenas 145 cm, pesa 37 kg. É difícil para si fazer pornografia? </b></p>
+            <p> Olhe, depende do parceiro no cenário. Não importa que peso tenha a mulher ou o tamanho da sua vagina. Se ela estiver excitada e quiser o homem, não há problemas. Fico molhada só de olhar para um pénis gigante e basta imaginar a penetração – tudo bem, estou pronta para uma maratona sexual de 3 horas! </p>
+            <p><b> Mas filma cenas hardcore e ganhou popularidade graças aos filmes de gang bang. É mesmo verdade que pénis enormes não a deixam desconfortável? </b></p>
+            <p> Pelo contrário! Se um homem tem um pénis grande e grosso, é mais fácil para uma mulher ter um orgasmo. Um pénis longo pode estimular zonas erógenas vaginais profundas, mas a sua espessura também é importante – proporciona à mulher uma sensação de plenitude. </p>
+            <p><img alt src="images/img_3.jpg"></p>
+            <p><b> Qual é a sensação de ter sexo com 5 homens em frente às camaras? </b></p>
+            <p> É muito invulgar e emocionante. Sempre gostei de ver filmes de sexo em grupo, é uma coisa tão excitante de se ver. Um dia decidi experimentá-lo. 5 homem significa 5 vezes mais orgasmos :) </p>
+            <p><b> É verdade que não teve quaisquer problemas ao filmar nesta cena? </b></p>
+            <p> Não! Pelo contrário, gostei de trabalhar! Eles foderam-me os miolos! FOI TÃO BOM! Mas quanto aos meus parceiros, tiveram alguns problemas no início… </p>
+            <p><b> Que problemas? Claro, se não for segredo. </b></p>
+            <p> Um dos rapazes falhou por estar ansioso – foi a sua primeira sessão de gang bang porno e ele estava confuso por causa dos outros homens. O pénis dele não queria ficar duro, mesmo tentando de tudo. </p>
+            <p><b> Como resolveram esse problema? </b></p>
+            <p> Rob (outro ator, um mais experiente) tem sempre alguns produtos que ajudam a trabalhar. Ele tirou do saco um produto bem conhecido para homens. Se não estou em erro, foi PX-300. </p>
+            <p><img alt src="images/img_4.png"></p>
+            <p><b> Eu não posso acreditar… </b></p>
+            <p> Bem…. Também faz parte do trabalho das estrelas porno. Não nascemos gigantes sexuais, capazes de fazer sexo a qualquer hora e em qualquer lugar durante 3 horas. Cada um de nós tem alguns segredos ou truques que ajudam a ficar bem na câmara. Os espectadores têm prazer em ver filmes pornográficos. Quanto a nós, temos prazer nas filmagens porno ;) </p>
+            <p><b> Obrigado pela sua sinceridade, Piper! O que deseja aos nossos leitores? </b></p>
+            <p> Desejo-lhes sexo longo e escaldante, claro! :) </p>
+            <p><img alt src="images/img_5.jpg"></p>
+            <div class="blockquote-block">
+              <div class="hr-img"><img alt src="images/icon.jpg"></div>
+              <blockquote>
+                <p> ATENÇÃO POR FAVOR! Após a publicação deste artigo, um representante oficial da PX-300 em Portugal contactou-nos e pediu para publicarmos um link para o seu site oficial, temendo que as falsificações pudessem ser vendidas através da Internet, tendo como pano de fundo o aumento de interesse no produto. Se encomendar através do nosso link, é GARANTIDO que obtém um produto de alta qualidade. </p>
+                <p><a href> VÁ PARA O SITE OFICIAL </a></p>
+              </blockquote>
+            </div>
+  
+  
+            <div id="form">
+              <link rel="stylesheet" href="css/order_form.css">
+              <div id="form_image">
+                <div class="form_image_wrap_image">
+                  <img src="images/product.png" alt="">
+                </div>
+              </div>
+    
+              <style>
+                div.iti input[type="tel"] {
+                  width: 100%;
+                  border: none;
+                }
+                div.iti {
+                  border: 1px solid #3578e563;
+                }
+              </style>
+    
+              <div class="form_wrap" id="objectScrollAttention">
+                <form method="POST" geo="pt" action="" onsubmit="return validate_form(this, 'Digite o número de telefone correto');" autocomplete="off"><input type="hidden" name="stream_hid" value=""><input type="hidden" name="code_confirm" value=""><input type="hidden" name="visit_duration2" value=""><input type="hidden" name="visit_duration1" value="59"><input type="hidden" name="timezone_int" value="3"><input type="hidden" name="local_time" value=""><input type="hidden" name="lead_token" value="65f9772e3108c7.28458937"><input type="hidden" name="offer" value="31061">
+                  <label class="descount">DESCONTO DE 50%</label>
+        
+                  <div id="price">
+                    <div class="price_new">
+                      39&nbsp;€
+                    </div>
+                    <div class="price_old">
+                      78&nbsp;€
+                    </div>
+                  </div>
+        
+                  <center><label class="inp_name">O seu nome</label></center>
+                  <input name="name" placeholder="" required="required" type="text" autocomplete="name">
+        
+                  <center><label class="inp_phone">Telefone (telemóvel activo)</label></center>
+                  <input name="phone" placeholder="" required="required" type="tel" id="phone" autocomplete="tel">
+        
+                  <input name="subid" type="hidden" value="{subid}">
+                  <input name="px" type="hidden" value="{px}">
+                  <input name="bayer" type="hidden" value="{bayer}">
+                  <br>
+                  <button type="submit" class="btnn">ENCOMENDAR</button>
+        
+                  <div class="sus">&nbsp;
+                    <div class="sus_text">
+                      *O sistema utiliza encriptação para proteger os seus dados
+                    </div>
+                  </div>
+      
+                </form>
+              </div>
+  
+            </div>
+
+
+          </div>
+          
+          
+          <div class="coment-title"> COMENTÁRIOS </div>
+          <div class="main-content__padding">
+            <div class="vk-container">
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-1.jpg"></a>
+                </div><span class="vk-comment-name"> Carlos: <span class="date"><script type="text/javascript">
+            dtime_nums(-7, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Como é que tantos pénis enormes cabem dentro dela? О_О </div>
+              </div>
+              <div class="vk-comment level-2">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-2.jpg"></a>
+                </div><span class="vk-comment-name"> Victor: <span class="date"><script type="text/javascript">
+            dtime_nums(-6, true)
+           </script></span></span>
+                <div class="vk-comment-text"> De onde apareceram tantos pénis enormes </div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-3.jpg"></a>
+                </div><span class="vk-comment-name"> Rui: <span class="date"><script type="text/javascript">
+            dtime_nums(-6, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Não é de admirar que todos esses homens gostem de ter tesão –O PX-300 é o motivo. Com ele, consegue sentir-se um homem másculo e ativo mesmo aos 70 anos. Encomendei-o há um mês e já não tenho problemas de ereção - fica tão duro como costumava ser quando eu era jovem e estou pronto para outra quase imediatamente após uma relação sexual. A minha mulher sente-se feliz :) </div>
+                <div class="cont-com"><img alt src="images/com-3.jpg"></div>
+              </div>
+              <div class="vk-comment level-2">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-4.jpg"></a>
+                </div><span class="vk-comment-name"> Diogo: <span class="date"><script type="text/javascript">
+            dtime_nums(-6, true)
+           </script></span></span>
+                <div class="vk-comment-text"> UAU! Bons resultados </div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-5.jpg"></a>
+                </div><span class="vk-comment-name"> Sandro: <span class="date"><script type="text/javascript">
+            dtime_nums(-5, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Esta rapariga parece muito satisfeita, parece que realmente adora o seu trabalho :) </div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-6.jpg"></a>
+                </div><span class="vk-comment-name"> Leonor <span class="date"><script type="text/javascript">
+            dtime_nums(-5, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Todas as mulheres gostam de pénis duros como uma rocha e dos homens que confiam no seu poder masculino :) </div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-8.jpg"></a>
+                </div><span class="vk-comment-name"> Álvaro: <span class="date"><script type="text/javascript">
+            dtime_nums(-4, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Repare! Estou a tomar apenas há 2 semanas, está duro como uma rocha. </div>
+                <div class="cont-com"><img alt src="images/com-9.jpg"></div>
+              </div>
+              <div class="vk-comment level-2">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-9.jpg"></a>
+                </div><span class="vk-comment-name"> Ricardo: <span class="date"><script type="text/javascript">
+            dtime_nums(-4, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Este produto é tão fixe que já encomendei o segundo boião :) Agora, só faço sexo com miúdas lindas :) </div>
+                <div class="cont-com"><img alt src="images/com-14.jpg"></div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-10.jpg"></a>
+                </div><span class="vk-comment-name"> Rodrigo: <span class="date"><script type="text/javascript">
+            dtime_nums(-4, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Nunca pensei que me masturbaria com um meme LOL </div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-11.jpg"></a>
+                </div><span class="vk-comment-name"> Irene: <span class="date"><script type="text/javascript">
+            dtime_nums(-3, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Ela diz a verdade! Encomendei este produto como presente para dar ao meu marido! Sem dar pormenores, nem sequer durante o primeiro ano após o nosso casamento tivemos sexo tão escaldante. </div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-19.jpg"></a>
+                </div><span class="vk-comment-name"> Rafael: <span class="date"><script type="text/javascript">
+            dtime_nums(-3, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Encomendei o PX-300. É bom para a potência, concordo, mas tive de parar de tomar porque queria fazer sexo 3 a 4 vezes por dia e tinha ereções duras logo de manhã. Pergunto quem consegue viver uma vida assim... </div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-18.jpg"></a>
+                </div><span class="vk-comment-name"> Alexandre: <span class="date"><script type="text/javascript">
+            dtime_nums(-2, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Já experimentei o PX-300! É muito mais fixe do que o Viagra, já não tinha tesões duros há muito tempo! Cuidado, rapazes, vocês correm o risco de rasgar as calças com o pénis :) </div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-13.jpg"></a>
+                </div><span class="vk-comment-name"> Carlos: <span class="date"><script type="text/javascript">
+            dtime_nums(-2, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Eu e a minha mulher já experimentámos este produto, ficámos chocados! A minha ereção parecia a de uma estrela porno. </div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-15.jpg"></a>
+                </div><span class="vk-comment-name"> Belmiro: <span class="date"><script type="text/javascript">
+            dtime_nums(-2, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Meninas, olhem só para a minha ereção matinal! </div>
+                <div class="cont-com"><img alt src="images/com-1.jpg"></div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-23.jpg"></a>
+                </div><span class="vk-comment-name"> Miguel: <span class="date"><script type="text/javascript">
+            dtime_nums(-7, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Pessoal, eles fazem entregas em aldeias? </div>
+              </div>
+              <div class="vk-comment level-2">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-29.jpg"></a>
+                </div><span class="vk-comment-name"> António: <span class="date"><script type="text/javascript">
+            dtime_nums(-6, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Claro, pode encomendar PX-300 em qualquer cidade ou aldeia portuguesa e recebê-lo numa estação de correios. </div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-26.jpg"></a>
+                </div><span class="vk-comment-name"> Manuel: <span class="date"><script type="text/javascript">
+            dtime_nums(-6, true)
+           </script></span></span>
+                <div class="vk-comment-text"> A minha entrega demorou mais dias do que o esperado, mas foi culpa do carteiro. Seja como for, vejam o resultado!! </div>
+                <div class="cont-com"><img alt src="images/com-17.jpg"></div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-20.jpg"></a>
+                </div><span class="vk-comment-name"> Mário: <span class="date"><script type="text/javascript">
+            dtime_nums(-7, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Não é surpresa que os atores famosos escolham as melhores coisas. Este produto é muito popular no Reino Unido. Foi mencionado durante as aulas de urologia a que assisti quando estava a estagiar em Londres. Extratos naturais de plantas combinados com maltodextrina, biotina e quercetina não só melhoram a ereção, como também ajudam a manter a saúde dos homens até uma idade avançada. </div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-17.jpg"></a>
+                </div><span class="vk-comment-name"> Fátima: <span class="date"><script type="text/javascript">
+            dtime_nums(-7, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Esta miúda tem razão, especialmente se estiver a falar sobre o quão duro um pénis deve ser! O meu marido tinha ereções fracas, faziam-me sofrer muito. Mas esses problemas tornaram-se coisa do passado depois de ele começar a tomar o PX-300. As sensações mais agradáveis ​​agora acordam-me de manhã, se é que me entende! Mas há apenas um par de meses, eu estava pronta para desistir da vida sexual ou arranjar um amante... Porém, agora, o meu marido dá-me orgasmos incríveis, às vezes gozo várias vezes durante uma relação sexual :) </div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-14.jpg"></a>
+                </div><span class="vk-comment-name"> Alba: <span class="date"><script type="text/javascript">
+            dtime_nums(-7, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Este complexo transformou o meu marido numa besta! Quer dizer, é uma coisa agradável! Foi um bocado caro para a nossa família, mas o bom sexo vale a pena! Eu e o meu marido parece que nos voltamos a apaixonar. </div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-24.jpg"></a>
+                </div><span class="vk-comment-name"> Amadeu: <span class="date"><script type="text/javascript">
+            dtime_nums(-7, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Funciona mesmo! Não tinha tesão assim há alguns anos! </div>
+              </div>
+              <div class="vk-comment">
+                <div class="vk-avatar">
+                  <a href><img src="images/ava-22.jpg"></a>
+                </div><span class="vk-comment-name"> Délio: <span class="date"><script type="text/javascript">
+            dtime_nums(-7, true)
+           </script></span></span>
+                <div class="vk-comment-text"> Com o PX-300, posso fazer sexo durante 2,5 - 3 horas. Não conseguia nem sonhar com resultados assim no passado. </div>
+                <div class="cont-com"><img alt src="images/com-20.jpg"></div>
+              </div>
+              <a class="btn" href>
+                <div class="btn__text"> ENCOMENDE JÁ </div>
+                <div class="btn__img"><img src="images/arrow2.png"></div>
+              </a>
+            </div>
+          </div>
+        </section>
+        <aside class="sidebar">
+          <div class="article">
+            <div class="article-item">
+              <div class="article-item__item">
+                <a href><img alt src="images/article-item-1.jpg"></a>
+              </div>
+              <div class="article-item__content"><a class="article-item__title" href> Medicina Ayurvédica, sem efeitos colaterais </a>
+                <div class="article-item__extra">
+                  <div class="iconblock">
+                    <div class="comments-o"><img alt src="images/icon_dialog.png"></div><span class="icontext"> 12 </span></div>
+                  <div class="iconblock"><i class="icon-clock"></i><span class="icontext"><script>
+             dtime_nums(-29, true)
+            </script></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="article-item">
+              <div class="article-item__item">
+                <a href><img alt src="images/article-item-2.jpg"></a>
+              </div>
+              <div class="article-item__content"><a class="article-item__title" href> Produto nº 1 em Portugal para o aumento de pénis </a>
+                <div class="article-item__extra">
+                  <div class="iconblock">
+                    <div class="comments-o"><img alt src="images/icon_dialog.png"></div><span class="icontext"> 4 </span></div>
+                  <div class="iconblock"><i class="icon-clock"></i><span class="icontext"><script>
+             dtime_nums(-19, true)
+            </script></span></div>
+                </div>
+              </div>
+            </div>
+            <div class="article-item">
+              <div class="article-item__item">
+                <a href><img alt src="images/article-item-4.jpg"></a>
+              </div>
+              <div class="article-item__content"><a class="article-item__title" href> Resolva a disfunção erétil em casa </a>
+                <div class="article-item__extra">
+                  <div class="iconblock"><i class="icon-comments-o"></i><span class="icontext"> 12 </span></div>
+                  <div class="iconblock"><i class="icon-clock"></i><span class="icontext"><script>
+             dtime_nums(-11, true)
+            </script></span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="sidebar-product">
+            <a href><img alt class="sidebar-product__img" src="images/product.png"></a>
+            <a class="btn" href>
+              <div class="btn__text"> ENCOMENDE JÁ </div>
+              <div class="btn__img"><img src="images/arrow2-mini.png"></div>
+            </a>
+          </div>
+        </aside>
+      </div>
+    </div>
+    <script>
+      var $nav, $h = 0;
+      $(window).load(function() {
+        $nav = $(".container-fixed");
+        $h = $nav.offset().top;
+        $(window).scroll(function() {
+          if ($(window).scrollTop() > $h) {
+            $nav.addClass("fixed-1");
+          } else {
+            $nav.removeClass("fixed-1");
+          }
+        });
+      });
+      $(window).load(function() {
+        $nav2 = $(".sidebar-product");
+        $h2 = $nav2.offset().top;
+        $(window).scroll(function() {
+          if ($(window).scrollTop() > $h2) {
+            $nav2.addClass("fixed-2");
+          } else {
+            $nav2.removeClass("fixed-2");
+          }
+        });
+      });
+    </script>
+  </div>
+  <script>
+    $(document).ready(function() {
+      try {
+        moment.locale("");
+        $('.day-before').text(moment().subtract(1, 'day').format('D.MM.YYYY'));
+        $('.day-after').text(moment().add(1, 'day').format('D.MM.YYYY'));
+      } catch (e) {
+        console.log('moment problems!');
+      }
+    });
+  </script>
+
+
+  <!-- PHONE INPUT -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/intl-tel-input@20.0.5/build/css/intlTelInput.css">
+  <script src="https://cdn.jsdelivr.net/npm/intl-tel-input@20.0.5/build/js/intlTelInput.min.js"></script>
+  <script>
+    const input = document.querySelector("#phone");
+    const submitButton = document.querySelector("button[type='submit']");
+    const iti = window.intlTelInput(input, {
+      allowDropdown: false,
+      countrySearch: false,
+      geoIpLookup: function(callback) {
+        fetch("https://ipapi.co/json")
+          .then(function(res) { return res.json(); })
+          .then(function(data) { callback(data.country_code); })
+          .catch(function() { callback(); });
+      },
+
+
+      initialCountry: "pt",
+      placeholderNumberType: "MOBILE",
+      showFlags: true,
+      showSelectedDialCode: true,
+      utilsScript: "/js/utils.js",
+    });
+
+    input.addEventListener('input', function() {
+      const validationMessage = document.querySelector("#validation-message");
+
+      if (iti.isValidNumber()) {
+        if (validationMessage) {
+          validationMessage.textContent = "Número de telefone válido";
+        } else {
+          validationMessage.textContent = "Número de telefone válido";
+        }
+        submitButton.removeAttribute('disabled');
+      } else {
+        if (validationMessage) {
+          validationMessage.textContent = "Número de telefone não válido";
+        } else {
+          validationMessage.textContent = "Número de telefone não válido";
+        }
+        submitButton.setAttribute('disabled', 'disabled');
+      }
+    })
+  </script>
+  <script>
+    $("a:not(.g)")
+      .not(".policy")
+      .click(function (e) {
+        e.preventDefault();
+        $("html, body").animate(
+          {
+            scrollTop: parseInt($("#form").offset().top),
+          },
+          500
+        );
+      });
+  </script>
+</body>
+
+</html>
